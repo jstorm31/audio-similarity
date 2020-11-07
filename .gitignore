@@ -148,3 +148,5 @@ data
 env
 
 .DS_Store
+.env
+mongo-*

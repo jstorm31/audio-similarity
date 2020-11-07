@@ -2,3 +2,5 @@ librosa
 dtw
 matplotlib
 pyacoustid
+pymongo
+dotenv
