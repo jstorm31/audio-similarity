@@ -1,7 +1,8 @@
 from mongoengine import *
 
-class Fingerprint(ABC, Document):
+
+class Fingerprint(Document):
     audiotrack = ReferenceField('Audiotrack', required=True)
     type = StringField(required=True)
     data = BinaryField()
-    meta = { 'allow_inheritance': True }
+    meta = {'allow_inheritance': True}
