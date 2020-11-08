@@ -2,5 +2,7 @@ librosa
 dtw
 matplotlib
 pyacoustid
-pymongo
-dotenv
+python-dotenv
+mongoengine
+cursor
+pathlib
