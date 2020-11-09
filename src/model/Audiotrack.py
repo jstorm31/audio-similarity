@@ -4,11 +4,11 @@ from mongoengine import *
 
 
 class Audiotrack(Document):
-    filename = StringField(required=True)
+    filename = StringField(required=True, unique=True)
     duration = FloatField(required=True)
 
-    @classmethod
-    def fromFilename(cls, filename):
+    def __init__(self, filename):
         signal, sr = librosa.load(os.getenv('DATA_PATH') + filename)
         duration = librosa.get_duration(y=signal, sr=sr)
-        return cls(filename=filename, duration=duration)
+        super(Audiotrack, self).__init__(
+            filename=filename, duration=duration)

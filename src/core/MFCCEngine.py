@@ -1,11 +1,9 @@
 import os
 import math
 import librosa
-import pickle
-from bson.binary import Binary
 from .Engine import Engine
 from model.Audiotrack import Audiotrack
-from model.Fingerprint import Fingerprint
+from model.MFCCFingerprint import MFCCFingerprint
 
 
 class MFCCEngine(Engine):
@@ -18,7 +16,7 @@ class MFCCEngine(Engine):
         mfcc = self.__extract_mfcc(audiotrack.filename)
         samples = self.__split_mfcc(mfcc)
 
-        return [self.__createFingerprint(audiotrack, sample) for sample in samples]
+        return [MFCCFingerprint(audiotrack, sample) for sample in samples]
 
     def compare(self, lhs, rhs):
         pass
@@ -40,8 +38,3 @@ class MFCCEngine(Engine):
         samples.append(mfcc[:, n_samples*self.sample_size:])
 
         return samples
-
-    def __createFingerprint(self, audiotrack, sample):
-        "Creates a Fingerprint from an MFCC descriptor sample"
-        data = Binary(pickle.dumps(sample, protocol=2))
-        return Fingerprint(audiotrack=audiotrack.id, type='mfcc', data=data)

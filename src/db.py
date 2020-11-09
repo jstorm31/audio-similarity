@@ -19,7 +19,7 @@ if __name__ == '__main__':
     engine = MFCCEngine(data_path=os.getenv('DATA_PATH'),
                         sample_size=200, n_mfcc=13)
 
-    track = Audiotrack.fromFilename(filename='sample_1.wav')
+    track = Audiotrack(filename='sample_1.wav')
     track.save()
     fingerprints = engine.extract_fingerprints(track)
 
