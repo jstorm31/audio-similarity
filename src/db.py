@@ -25,7 +25,7 @@ def build_db():
     fingerprint_cnt = 0
 
     for file in files:
-        track = Audiotrack(filename=file)
+        track = Audiotrack.create(filename=file)
         track.save()
         fingerprints = engine.extract_fingerprints(track)
 
@@ -37,9 +37,7 @@ def build_db():
           (fingerprint_cnt, len(files), time.time() - start))
 
 
-if __name__ == '__main__':
-    load_dotenv()
-
+def db_connect():
     connect(db=os.getenv('MONGO_DB_NAME'),
             host=os.getenv('MONGO_DOMAIN'),
             port=int(os.getenv('MONGO_PORT')),
@@ -47,6 +45,10 @@ if __name__ == '__main__':
             password=os.getenv('MONGO_INITDB_ROOT_PASSWORD'),
             authentication_source='admin')
 
+
+if __name__ == '__main__':
+    load_dotenv()
+    db_connect()
     # Clear collections
     Audiotrack.drop_collection()
     Fingerprint.drop_collection()

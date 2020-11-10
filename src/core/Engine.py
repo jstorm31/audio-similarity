@@ -15,3 +15,7 @@ class Engine(ABC):
     @abstractmethod
     def compare(self, lhs, rhs):
         pass
+
+    @abstractmethod
+    def find_match(self, audiotrack):
+        pass
