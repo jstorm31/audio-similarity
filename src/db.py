@@ -19,7 +19,7 @@ def is_audiofile(data_path, file):
 def build_db():
     start = time.time()
     data_path = os.getenv('DATA_PATH')
-    engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=13)
+    engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
 
     files = [f for f in listdir(data_path) if is_audiofile(data_path, f)]
     fingerprint_cnt = 0
