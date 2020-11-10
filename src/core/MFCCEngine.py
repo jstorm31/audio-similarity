@@ -28,11 +28,24 @@ class MFCCEngine(Engine):
 
     def find_match(self, audiotrack, top_k=10):
         fingerprints = MFCCFingerprint.objects(type='mfcc')
-        ref_mfcc = self.extract_fingerprints(audiotrack)[1].deserialize_data()
+        ref_mfcc = self.extract_fingerprints(audiotrack)
 
-        matches = self.__calc_fingerprints_distance(ref_mfcc, fingerprints)
-        song_matches = self.__average_matches(matches, top_k)
-        return song_matches
+        # Calculate top track matches for each reference mfcc and make an average from it
+        total_matches = {}
+        for fragment in ref_mfcc:
+            sample_matches = self.__calc_fingerprints_distance(
+                fragment.deserialize_data(), fingerprints)
+            song_matches = self.__average_matches(sample_matches, top_k)
+
+            if not total_matches:
+                total_matches = song_matches
+            else:
+                # Calcualte average from current and new matches
+                total_matches = {
+                    key: (dist + total_matches[key]) / 2 for key, dist in song_matches.items()}
+
+        # Sort by distance
+        return [(k, v) for k, v in sorted(total_matches.items(), key=lambda x: x[1])]
 
     def __calc_fingerprints_distance(self, ref_mfcc, fingerprints):
         "Loop over all samples in the database and find the best match"
@@ -46,7 +59,7 @@ class MFCCEngine(Engine):
             if ref_mfcc.shape[1] == mfcc.shape[1]:
                 dist = self.compare(ref_mfcc, mfcc)
             elif ref_mfcc.shape[1] < mfcc.shape[1]:
-                dist = self.compare(ref_mfcc, mfcc[:, mfcc.shape[1]])
+                dist = self.compare(ref_mfcc, mfcc[:, ref_mfcc.shape[1]])
             else:
                 dist = self.compare(ref_mfcc[:, mfcc.shape[1]], mfcc)
 
@@ -69,13 +82,8 @@ class MFCCEngine(Engine):
                 song_matches[filename]['sum'] += match['dist']
 
         # Map into average
-        song_matches = {key: (value['sum'] / value['count'])
-                        for key, value in song_matches.items()}
-
-        # Return sorted dictionary song -> average distance sorted descending
-        song_matches = {k: v for k, v in sorted(
-            song_matches.items(), key=lambda item: item[1])}
-        return list(song_matches.items())[:top_k]
+        return {key: (value['sum'] / value['count'])
+                for key, value in song_matches.items()}
 
     def __extract_mfcc(self, file_path):
         "Extracts MFCC descriptors from a audiotrack located in the file_path"
