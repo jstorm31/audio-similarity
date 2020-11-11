@@ -1,12 +1,43 @@
 version: "3.7"
 
 services:
-  py-mongo:
-    build:
-      context: ${PWD}
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --auth
     ports:
       - "27017:27017"
+    networks:
+      - backend
+    env_file: .env
     volumes:
-      - $PWD/mongo-data:/data/db
-    env_file:
-      - .env
+      - mongodbdata:/data/db
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: gunicorn --bind 0.0.0.0:5000 app:app
+    ports:
+      - "5000:5000"
+    env_file: .env
+    volumes:
+      - appdata:/var/www/
+    depends_on:
+      - mongodb
+    networks:
+      - frontend
+      - backend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  mongodbdata:
+    driver: local
+  appdata:
+    driver: local

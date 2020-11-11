@@ -1,8 +1,9 @@
 librosa
 dtw
 matplotlib
-pyacoustid
 python-dotenv
-mongoengine
 cursor
 pathlib
+flask
+flask_mongoengine
+gunicorn
