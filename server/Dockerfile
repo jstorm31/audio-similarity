@@ -10,10 +10,16 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Turn off buffering
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get install -y libsndfile1 ffmpeg
+
 # Install requirements using pip
-ADD requirements.txt .
+ADD ./server/requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 # Set working directory and addour Flask API files
 WORKDIR /app
-ADD . /app
+ENV DATA_PATH /app/data/
+ADD ./server /app
+ADD ./data /app/data
+ADD .env /app
+

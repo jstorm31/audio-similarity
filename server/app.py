@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 
 from flask import Flask, Response, request
 from flask_mongoengine import MongoEngine
+from model.Audiotrack import Audiotrack
+from model.Fingerprint import Fingerprint
+from core.MFCCEngine import MFCCEngine
+
 
 load_dotenv()
 
@@ -22,22 +26,17 @@ app.config['MONGODB_SETTINGS'] = {
 db = MongoEngine()
 db.init_app(app)
 
+engine = MFCCEngine(data_path=os.getenv(
+        'DATA_PATH'), sample_size=200, n_mfcc=10)
 
-class Todo(db.Document):
-    title = db.StringField(max_length=60)
-    text = db.StringField()
-    done = db.BooleanField(default=False)
-    pub_date = db.DateTimeField(default=datetime.datetime.now)
-
-
-@app.route("/api")
+@app.route("/search")
 def index():
-    Todo.objects().delete()
-    Todo(title="Simple todo A", text="12345678910").save()
-    Todo(title="Simple todo B", text="12345678910").save()
-    Todo.objects(title__contains="B").update(set__text="Hello world")
-    todos = Todo.objects().to_json()
-    return Response(todos, mimetype="application/json", status=200)
+    # tracks = Audiotrack.objects().to_json()
+
+    # track = Audiotrack.create(filename='recorded_sample_1.m4a')
+    # matches = engine.find_match(track, top_k=5)
+
+    return Response("{}", mimetype="application/json", status=200)
 
 
 if __name__ == "__main__":

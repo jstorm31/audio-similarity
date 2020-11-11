@@ -38,9 +38,8 @@ def build_db():
 
 
 def db_connect():
-    connect(db=os.getenv('MONGO_DB_NAME'),
-            host=os.getenv('MONGO_DOMAIN'),
-            port=int(os.getenv('MONGO_PORT')),
+    connect(db=os.getenv('MONGO_INITDB_DATABASE'),
+            host=os.getenv('MONGODB_HOST'),
             username=os.getenv('MONGO_INITDB_ROOT_USERNAME'),
             password=os.getenv('MONGO_INITDB_ROOT_PASSWORD'),
             authentication_source='admin')
@@ -49,6 +48,7 @@ def db_connect():
 if __name__ == '__main__':
     load_dotenv()
     db_connect()
+    
     # Clear collections
     Audiotrack.drop_collection()
     Fingerprint.drop_collection()
