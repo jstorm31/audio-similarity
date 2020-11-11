@@ -1,6 +1,3 @@
-init:
-	pip3 install -r requirements.txt
-
 build:
 	docker-compose build
 
