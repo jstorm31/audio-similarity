@@ -1,8 +1,9 @@
 import datetime
 import os
+import json
 from dotenv import load_dotenv
 
-from flask import Flask, Response, request
+from flask import Flask, Response, request, abort, jsonify
 from flask_mongoengine import MongoEngine
 from model.Audiotrack import Audiotrack
 from model.Fingerprint import Fingerprint
@@ -18,26 +19,36 @@ username = os.getenv('MONGO_INITDB_ROOT_USERNAME')
 password = os.getenv('MONGO_INITDB_ROOT_PASSWORD')
 database = os.getenv('MONGO_INITDB_DATABASE')
 
-app.config['MONGODB_SETTINGS'] = {
-    'connect': False,
-    'host': 'mongodb://' + username + ':' + password + '@' + host + ':27017' + '/' + database + '?authSource=admin'
-}
+app.config['MONGODB_SETTINGS'] = {'connect': False, 'host': 'mongodb://' + username +
+                                  ':' + password + '@' + host + ':27017' + '/' + database + '?authSource=admin'}
 
 db = MongoEngine()
 db.init_app(app)
 
-engine = MFCCEngine(data_path=os.getenv(
-        'DATA_PATH'), sample_size=200, n_mfcc=10)
+data_path = os.getenv('DATA_PATH')
 
-@app.route("/search")
-def index():
-    # tracks = Audiotrack.objects().to_json()
+engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
 
-    # track = Audiotrack.create(filename='recorded_sample_1.m4a')
-    # matches = engine.find_match(track, top_k=5)
 
-    return Response("{}", mimetype="application/json", status=200)
+def json_abort(status_code, message):
+    response = jsonify({'error': message})
+    response.status_code = status_code
+    abort(response)
+
+
+@app.route("/search", methods=['POST'])
+def search():
+    if not request.files:
+        json_abort(400, "'audiotrack' key not set")
+
+    audiotrack = request.files['audiotrack']
+    audiotrack.save(os.path.join(data_path, audiotrack.filename))
+
+    track = Audiotrack.create(filename='recorded_sample_1.m4a')
+    matches = engine.find_match(track, top_k=5)
+
+    return Response(json.dumps(matches), mimetype="application/json", status=200)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000)

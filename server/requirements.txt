@@ -6,4 +6,3 @@ cursor
 pathlib
 flask
 flask_mongoengine
-gunicorn

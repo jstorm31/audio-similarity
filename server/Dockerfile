@@ -18,8 +18,9 @@ RUN python -m pip install -r requirements.txt
 
 # Set working directory and addour Flask API files
 WORKDIR /app
-ENV DATA_PATH /app/data/
+ENV DATA_PATH /app_data/
 ADD ./server /app
-ADD ./data /app/data
 ADD .env /app
+ADD ./data /app_data
 
+CMD python app.py

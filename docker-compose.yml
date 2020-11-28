@@ -18,12 +18,12 @@ services:
     build:
       context: ./
       dockerfile: ./server/Dockerfile
-    command: gunicorn --bind 0.0.0.0:5000 app:app
     ports:
       - "5000:5000"
     env_file: .env
     volumes:
-      - appdata:/var/www/
+      - appdata:/app_data
+      - ./server:/app
     depends_on:
       - mongodb
     networks:

@@ -71,8 +71,8 @@ class MFCCEngine(Engine):
     def __average_matches(self, matches, top_k):
         "Calculate sum of top 3 samples for a song"
         song_matches = {}
-
-        for i in len(matches):
+        
+        for i in range(len(matches)):
             match = matches[i]
             filename = match['filename']
 
@@ -81,7 +81,8 @@ class MFCCEngine(Engine):
             elif song_matches[filename]['count'] < 3:
                 song_matches[filename]['count'] += 1
                 # Add distance weighted by logarithm of its position in the list
-                song_matches[filename]['sum'] += match['dist'] * (1 + math.log(i + 1, 10))
+                song_matches[filename]['sum'] += match['dist'] * \
+                    (1 + math.log(i + 1, 10))
 
         # Map into average
         return {key: (value['sum'] / value['count'])
