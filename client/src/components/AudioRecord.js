@@ -14,7 +14,7 @@ const AudioRecord = ({ isSearching, upload }) => {
     const [chunks, setChunks] = React.useState([]);
     const recorderRef = React.useRef(null);
 
-    const initRecorder = async () => {
+    const initRecorder = React.useCallback(async () => {
         if (!navigator.mediaDevices) {
             console.error('recording not supported');
             return;
@@ -22,9 +22,25 @@ const AudioRecord = ({ isSearching, upload }) => {
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recorderRef.current = new MediaRecorder(stream);
-    };
 
-    const transition = async () => {
+        recorderRef.current.onstop = () => {
+            console.log('stop');
+            const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+            const file = new File([blob], 'recording.ogg');
+
+            upload(file);
+            setChunks([]);
+        };
+
+        recorderRef.current.ondataavailable = (e) => {
+            setChunks((prevChunks) => {
+                prevChunks.push(e.data);
+                return prevChunks;
+            });
+        };
+    }, [chunks, upload]);
+
+    const transition = React.useCallback(async () => {
         switch (state) {
             case State.INIT:
                 if (!recorderRef.current) {
@@ -48,28 +64,7 @@ const AudioRecord = ({ isSearching, upload }) => {
             default:
                 console.error('Undefiend state transition');
         }
-    };
-
-    React.useEffect(() => {
-        if (!recorderRef.current) {
-            return;
-        }
-
-        recorderRef.current.onstop = () => {
-            const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-            const file = new File([blob], 'recording.ogg');
-
-            upload(file);
-            setChunks([]);
-        };
-
-        recorderRef.current.ondataavailable = (e) => {
-            setChunks((prevChunks) => {
-                prevChunks.push(e.data);
-                return prevChunks;
-            });
-        };
-    }, [chunks, upload]);
+    }, [state, setState, setSearched, initRecorder]);
 
     React.useEffect(() => {
         if (!hasSearched && isSearching) {
@@ -81,7 +76,7 @@ const AudioRecord = ({ isSearching, upload }) => {
         if (!isSearching && hasSearched) {
             transition();
         }
-    }, [isSearching, hasSearched]);
+    }, [isSearching, hasSearched, transition]);
 
     return (
         <Button
