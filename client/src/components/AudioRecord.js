@@ -14,6 +14,8 @@ const AudioRecord = ({ isSearching, upload }) => {
     const [chunks, setChunks] = React.useState([]);
     const recorderRef = React.useRef(null);
 
+    console.log(chunks);
+
     const initRecorder = React.useCallback(async () => {
         if (!navigator.mediaDevices) {
             console.error('recording not supported');
@@ -24,7 +26,6 @@ const AudioRecord = ({ isSearching, upload }) => {
         recorderRef.current = new MediaRecorder(stream);
 
         recorderRef.current.onstop = () => {
-            console.log('stop');
             const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
             const file = new File([blob], 'recording.webm');
 
@@ -33,12 +34,10 @@ const AudioRecord = ({ isSearching, upload }) => {
         };
 
         recorderRef.current.ondataavailable = (e) => {
-            setChunks((prevChunks) => {
-                prevChunks.push(e.data);
-                return prevChunks;
-            });
+            chunks.push(e.data);
+            setChunks(chunks);
         };
-    }, [chunks, upload]);
+    }, [chunks, upload, setChunks]);
 
     const transition = React.useCallback(async () => {
         switch (state) {
@@ -59,7 +58,6 @@ const AudioRecord = ({ isSearching, upload }) => {
             case State.SEARCHING:
                 setState(State.INIT);
                 setSearched(false);
-                recorderRef.current = null;
                 break;
 
             default:
