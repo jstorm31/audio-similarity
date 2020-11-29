@@ -67,10 +67,10 @@ const AudioRecord = ({ isSearching, upload }) => {
     }, [state, setState, setSearched, initRecorder]);
 
     React.useEffect(() => {
-        if (!hasSearched && isSearching) {
+        if (!hasSearched && isSearching && state === State.SEARCHING) {
             setSearched(true);
         }
-    }, [isSearching, hasSearched]);
+    }, [isSearching, hasSearched, state]);
 
     React.useEffect(() => {
         if (!isSearching && hasSearched) {

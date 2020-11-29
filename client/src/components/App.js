@@ -41,7 +41,7 @@ export const App = () => {
         <Layout>
             <Layout.Content className="content">
                 <Title style={{ marginBottom: '0.5rem' }}>Search audio</Title>
-                <Text>Record an audio or upload a file to search similar audiotracks.</Text>
+                <Text>Record an audio or upload a file to search for similar audiotracks.</Text>
 
                 <section style={{ marginTop: '1rem' }} className="section">
                     <form>
