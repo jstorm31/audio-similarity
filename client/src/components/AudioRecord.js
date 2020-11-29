@@ -11,10 +11,10 @@ const State = {
 const AudioRecord = ({ isSearching, upload }) => {
     const [state, setState] = React.useState(State.INIT);
     const [hasSearched, setSearched] = React.useState(false);
-    const [chunks, setChunks] = React.useState([]);
-    const recorderRef = React.useRef(null);
 
-    console.log(chunks);
+    const recorderRef = React.useRef(null);
+    const streamRef = React.useRef(null);
+    const chunksRef = React.useRef([]);
 
     const initRecorder = React.useCallback(async () => {
         if (!navigator.mediaDevices) {
@@ -22,22 +22,20 @@ const AudioRecord = ({ isSearching, upload }) => {
             return;
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recorderRef.current = new MediaRecorder(stream);
-
-        recorderRef.current.onstop = () => {
-            const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
-            const file = new File([blob], 'recording.webm');
-
-            upload(file);
-            setChunks([]);
-        };
+        streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recorderRef.current = new MediaRecorder(streamRef.current);
 
         recorderRef.current.ondataavailable = (e) => {
-            chunks.push(e.data);
-            setChunks(chunks);
+            chunksRef.current.push(e.data);
         };
-    }, [chunks, upload, setChunks]);
+
+        recorderRef.current.onstop = () => {
+            const blob = new Blob(chunksRef.current, { type: 'audio/webm;codecs=opus' });
+            const file = new File([blob], 'recording.webm');
+            upload(file);
+            chunksRef.current = [];
+        };
+    }, [upload]);
 
     const transition = React.useCallback(async () => {
         switch (state) {
@@ -52,12 +50,15 @@ const AudioRecord = ({ isSearching, upload }) => {
 
             case State.RECORDING:
                 recorderRef.current.stop();
+                streamRef.current.getTracks().forEach((track) => track.stop());
                 setState(State.SEARCHING);
                 break;
 
             case State.SEARCHING:
                 setState(State.INIT);
                 setSearched(false);
+                recorderRef.current = null;
+                streamRef.current = null;
                 break;
 
             default:
