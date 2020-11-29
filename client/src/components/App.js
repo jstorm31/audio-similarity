@@ -1,22 +1,26 @@
-import React from "react";
-import { Layout, Typography, Row, Col, Alert } from "antd";
-import "antd/dist/antd.css";
+import React from 'react';
+import { Layout, Typography, Row, Col, Alert } from 'antd';
+import 'antd/dist/antd.css';
 
-import "./App.css";
-import AudioUpload from "./AudioUpload";
-import AudioRecord from "./AudioRecord";
-import TrackList from "./TrackList";
-import upload from "../upload";
+import './App.css';
+import AudioUpload from './AudioUpload';
+import AudioRecord from './AudioRecord';
+import TrackList from './TrackList';
+import upload from '../upload';
+import PlayAudio from './PlayAudio';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 export const App = () => {
+    const [filename, setFilename] = React.useState(null);
     const [tracks, setTracks] = React.useState([]);
     const [isUploading, setUploading] = React.useState(false);
     const [error, setError] = React.useState(null);
 
     const handleUpload = async (file) => {
         setUploading(true);
+        setTracks([]);
+        setFilename(file.name);
 
         try {
             const response = await upload(file.originFileObj);
@@ -49,7 +53,14 @@ export const App = () => {
                             </Col>
                         </Row>
 
-                        {error && <Alert type="error" message={error} style={{ marginTop: "2rem" }} />}
+                        {filename && (
+                            <div className="sample">
+                                <Text style={{ marginRight: '1rem' }}>{filename}</Text>
+                                <PlayAudio filename={filename} />
+                            </div>
+                        )}
+
+                        {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
                     </form>
                 </section>
 

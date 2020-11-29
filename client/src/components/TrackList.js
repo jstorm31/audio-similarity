@@ -1,23 +1,24 @@
-import React from "react";
-import { Typography, Table, Button } from "antd";
-import { PlayCircleOutlined } from "@ant-design/icons";
+import React from 'react';
+import { Typography, Table } from 'antd';
+import PlayAudio from './PlayAudio';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const columns = [
     {
-        title: "Filename",
-        dataIndex: "filename",
-        key: "filename",
+        title: 'Filename',
+        dataIndex: 'filename',
+        key: 'filename',
     },
     {
-        title: "Similarity",
-        dataIndex: "similarity",
-        key: "similarity",
+        title: 'Similarity',
+        dataIndex: 'similarity',
+        key: 'similarity',
+        render: (similarity) => Number(similarity).toFixed(2),
     },
     {
-        key: "action",
-        render: (_, { filename }) => <Button shape="circle" icon={<PlayCircleOutlined />} />,
+        key: 'action',
+        render: (_, { filename }) => <PlayAudio filename={filename} />,
     },
 ];
 

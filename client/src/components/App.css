@@ -23,3 +23,10 @@ body {
     display: flex;
     justify-content: center;
 }
+
+.sample {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
