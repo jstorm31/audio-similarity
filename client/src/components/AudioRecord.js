@@ -25,8 +25,8 @@ const AudioRecord = ({ isSearching, upload }) => {
 
         recorderRef.current.onstop = () => {
             console.log('stop');
-            const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
-            const file = new File([blob], 'recording.ogg');
+            const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
+            const file = new File([blob], 'recording.webm');
 
             upload(file);
             setChunks([]);
@@ -59,6 +59,7 @@ const AudioRecord = ({ isSearching, upload }) => {
             case State.SEARCHING:
                 setState(State.INIT);
                 setSearched(false);
+                recorderRef.current = null;
                 break;
 
             default:
