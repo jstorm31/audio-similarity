@@ -21,6 +21,12 @@ const PlayAudio = ({ audio: audioProp, filename }) => {
         }
     }, [audioProp]);
 
+    const resetAudio = () => {
+        setPlaying(false);
+        audio.pause();
+        audio.currentTime = 0;
+    };
+
     const handleClick = () => {
         if (!audio) {
             console.warn('Audio not initialiized');
@@ -31,10 +37,21 @@ const PlayAudio = ({ audio: audioProp, filename }) => {
             setPlaying(true);
             audio.play();
         } else {
-            setPlaying(false);
-            audio.pause();
+            resetAudio();
         }
     };
+
+    React.useEffect(() => {
+        let timeout;
+
+        if (playing && audio) {
+            timeout = setTimeout(() => {
+                resetAudio();
+            }, audio.duration * 1000);
+        }
+
+        return () => clearTimeout(timeout);
+    }, [playing, audio]);
 
     return <Button shape="circle" icon={playing ? <PauseOutlined /> : <CaretRightFilled />} onClick={handleClick} />;
 };
