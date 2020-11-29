@@ -11,7 +11,7 @@ body {
 
 .section {
     background-color: white;
-    padding: 2rem;
+    padding: 2rem 1rem 1rem;
     box-shadow: 0 0 12px #eee;
     margin-bottom: 2rem;
 }

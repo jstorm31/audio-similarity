@@ -45,7 +45,7 @@ export const App = () => {
 
                 <section style={{ marginTop: '1rem' }} className="section">
                     <form>
-                        <Row>
+                        <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12}>
                                 <div className="center">
                                     <AudioRecord isSearching={isSearching} upload={handleUpload} />
