@@ -1,17 +1,19 @@
 import React from "react";
-import { Typography, Upload } from "antd";
-// import { InboxOutlined } from "@ant-design/icons";
+import { Upload, Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
-
-const AudioUpload = () => (
-    <>
-        <Title level={2}>Upload a file</Title>
-        <Upload.Dragger name="audiotrack" accept=".mp3,.mp4,.wav,.m4a" showUploadList={false}>
-            {/* <InboxOutlined /> */}
-            <Text>Upload an audiofile</Text>
-        </Upload.Dragger>
-    </>
+const AudioUpload = ({ isUploading, upload }) => (
+    <Upload
+        name="audiotrack"
+        accept=".mp3,.mp4,.wav,.m4a"
+        showUploadList={false}
+        customRequest={() => null}
+        onChange={({ file }) => upload(file)}
+    >
+        <Button icon={<UploadOutlined />} loading={isUploading} disabled={isUploading}>
+            {isUploading ? "Searching..." : "Upload an audiofile"}
+        </Button>
+    </Upload>
 );
 
 export default AudioUpload;

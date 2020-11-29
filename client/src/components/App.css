@@ -1,0 +1,25 @@
+body {
+    background-color: #f0f2f5;
+}
+
+.content {
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.section {
+    background-color: white;
+    padding: 2rem;
+    box-shadow: 0 0 12px #eee;
+    margin-bottom: 3rem;
+}
+
+.section--table {
+    padding: 0;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}

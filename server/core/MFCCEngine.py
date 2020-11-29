@@ -45,7 +45,7 @@ class MFCCEngine(Engine):
                     key: (dist + total_matches[key]) / 2 for key, dist in song_matches.items()}
 
         # Sort by distance
-        return [(k, v) for k, v in sorted(total_matches.items(), key=lambda x: x[1])]
+        return [{'filename': k, 'similarity': v} for k, v in sorted(total_matches.items(), key=lambda x: x[1])]
 
     def __calc_fingerprints_distance(self, ref_mfcc, fingerprints):
         "Loop over all samples in the database and find the best match"
@@ -71,7 +71,7 @@ class MFCCEngine(Engine):
     def __average_matches(self, matches, top_k):
         "Calculate sum of top 3 samples for a song"
         song_matches = {}
-        
+
         for i in range(len(matches)):
             match = matches[i]
             filename = match['filename']

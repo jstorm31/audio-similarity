@@ -4,6 +4,7 @@ import json
 from dotenv import load_dotenv
 
 from flask import Flask, Response, request, abort, jsonify
+from flask_cors import CORS, cross_origin
 from flask_mongoengine import MongoEngine
 from model.Audiotrack import Audiotrack
 from model.Fingerprint import Fingerprint
@@ -13,6 +14,7 @@ from core.MFCCEngine import MFCCEngine
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 host = os.getenv('MONGODB_HOST')
 username = os.getenv('MONGO_INITDB_ROOT_USERNAME')
@@ -38,6 +40,8 @@ def json_abort(status_code, message):
 
 @app.route("/search", methods=['POST'])
 def search():
+    print(request.files)
+
     if not request.files:
         json_abort(400, "'audiotrack' key not set")
 

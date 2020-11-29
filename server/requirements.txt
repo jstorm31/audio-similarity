@@ -5,4 +5,5 @@ python-dotenv
 cursor
 pathlib
 flask
+flask-cors
 flask_mongoengine

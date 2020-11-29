@@ -17,7 +17,7 @@ logs:
 	docker-compose logs -f
 	
 server:
-	DOCKER_BUILDKIT=1 docker-compose up --remove-orphans --build server
+	DOCKER_BUILDKIT=1 docker-compose up -d --remove-orphans --build server
 
 db:
 	docker-compose exec server python ./db.py

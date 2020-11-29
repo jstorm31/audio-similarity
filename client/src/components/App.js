@@ -1,34 +1,59 @@
 import React from "react";
-import { Layout, Typography, Row, Col } from "antd";
+import { Layout, Typography, Row, Col, Alert } from "antd";
 import "antd/dist/antd.css";
 
-// import AudioUpload from "./AudioUpload";
+import "./App.css";
+import AudioUpload from "./AudioUpload";
 import AudioRecord from "./AudioRecord";
 import TrackList from "./TrackList";
+import upload from "../upload";
 
 const { Title } = Typography;
 
 export const App = () => {
-    const [file, setFile] = React.useState(null);
     const [tracks, setTracks] = React.useState([]);
+    const [isUploading, setUploading] = React.useState(false);
+    const [error, setError] = React.useState(null);
+
+    const handleUpload = async (file) => {
+        setUploading(true);
+
+        try {
+            const response = await upload(file.originFileObj);
+            setTracks(response);
+            setError(null);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
 
     return (
         <Layout>
-            <Layout.Content style={{ width: "100%", maxWidth: 800, margin: "2rem auto" }}>
+            <Layout.Content className="content">
                 <Title>Search audio</Title>
 
-                <section>
-                    <Row>
-                        <Col xs={24} sm={12}>
-                            {/* <Upload /> */}
-                        </Col>
-                        <Col xs={24} sm={12}>
-                            <AudioRecord />
-                        </Col>
-                    </Row>
+                <section className="section">
+                    <form>
+                        <Row>
+                            <Col xs={24} sm={12}>
+                                <div className="center">
+                                    <AudioRecord upload={handleUpload} />
+                                </div>
+                            </Col>
+                            <Col xs={24} sm={12}>
+                                <div className="center">
+                                    <AudioUpload isUploading={isUploading} upload={handleUpload} />
+                                </div>
+                            </Col>
+                        </Row>
+
+                        {error && <Alert type="error" message={error} style={{ marginTop: "2rem" }} />}
+                    </form>
                 </section>
 
-                <TrackList tracks={tracks} />
+                {tracks.length > 0 && <TrackList tracks={tracks} />}
             </Layout.Content>
         </Layout>
     );
