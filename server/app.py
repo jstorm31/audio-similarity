@@ -3,7 +3,7 @@ import os
 import json
 from dotenv import load_dotenv
 
-from flask import Flask, Response, request, abort, jsonify
+from flask import Flask, Response, request, abort, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_mongoengine import MongoEngine
 from model.Audiotrack import Audiotrack
@@ -52,6 +52,11 @@ def search():
     matches = engine.find_match(track, top_k=5)
 
     return Response(json.dumps(matches), mimetype="application/json", status=200)
+
+
+@app.route('/audiotracks/<path:filename>')
+def serve_audiotracks(filename):
+    return send_from_directory(data_path, filename)
 
 
 if __name__ == "__main__":
