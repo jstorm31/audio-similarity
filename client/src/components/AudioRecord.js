@@ -69,19 +69,19 @@ const AudioRecord = ({ isSearching, upload }) => {
                 return prevChunks;
             });
         };
-    }, [recorderRef.current, chunks, upload]);
+    }, [chunks, upload]);
 
     React.useEffect(() => {
         if (!hasSearched && isSearching) {
             setSearched(true);
         }
-    }, [isSearching]);
+    }, [isSearching, hasSearched]);
 
     React.useEffect(() => {
         if (!isSearching && hasSearched) {
             transition();
         }
-    }, [isSearching, hasSearched, transition]);
+    }, [isSearching, hasSearched]);
 
     return (
         <Button
