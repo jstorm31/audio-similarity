@@ -40,15 +40,13 @@ def json_abort(status_code, message):
 
 @app.route("/search", methods=['POST'])
 def search():
-    print(request.files)
-
     if not request.files:
         json_abort(400, "'audiotrack' key not set")
 
     audiotrack = request.files['audiotrack']
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
 
-    track = Audiotrack.create(filename='recorded_sample_1.m4a')
+    track = Audiotrack.create(filename=audiotrack.filename)
     matches = engine.find_match(track, top_k=5)
 
     return Response(json.dumps(matches), mimetype="application/json", status=200)

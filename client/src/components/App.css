@@ -4,7 +4,8 @@ body {
 
 .content {
     width: 100%;
-    max-width: 800px;
+    max-width: 600px;
+    padding: 0 1rem;
     margin: 2rem auto;
 }
 
@@ -12,7 +13,7 @@ body {
     background-color: white;
     padding: 2rem;
     box-shadow: 0 0 12px #eee;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .section--table {
