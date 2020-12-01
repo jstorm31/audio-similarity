@@ -10,7 +10,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Turn off buffering
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get install -y libsndfile1 ffmpeg
+RUN apt-get update && apt-get install -y libsndfile1 ffmpeg libchromaprint-tools
 
 # Install requirements using pip
 ADD ./server/requirements.txt .
