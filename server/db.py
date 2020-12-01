@@ -1,4 +1,6 @@
 import os
+import getopt
+import sys
 import time
 from os import listdir
 from os.path import isfile, join
@@ -8,6 +10,7 @@ from mongoengine import connect
 from model.Audiotrack import Audiotrack
 from model.Fingerprint import Fingerprint
 from core.MFCCEngine import MFCCEngine
+from core.ChromaprintEngine import ChromaprintEngine
 
 
 def is_audiofile(data_path, file):
@@ -16,10 +19,18 @@ def is_audiofile(data_path, file):
     return isfile(join(data_path, file)) and extension in audio_extensions
 
 
-def build_db():
+def build_db(engine_type):
+    print("Building db with %s engine" % engine_type)
     start = time.time()
     data_path = os.getenv('DATA_PATH')
-    engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
+
+    if engine_type == 'mfcc':
+        engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
+    elif engine_type == 'chromaprint':
+        engine = ChromaprintEngine(data_path=data_path)
+    else:
+        print("Undefined engine type. Available engines: mfcc, chromaprint")
+        sys.exit(2)
 
     files = [f for f in listdir(data_path) if is_audiofile(data_path, f)]
     fingerprint_cnt = 0
@@ -48,9 +59,20 @@ def db_connect():
 if __name__ == '__main__':
     load_dotenv()
     db_connect()
-    
+
+    try:
+        arguments, values = getopt.getopt(sys.argv[1:], 'e', 'engine')
+    except getopt.error as err:
+        print(str(err))
+        sys.exit(2)
+
+    engine_type = 'chromaprint'
+    for i in range(len(arguments)):
+        if arguments[i][0] in ('-e', '--engine'):
+            engine_type = values[i]
+
     # Clear collections
     Audiotrack.drop_collection()
     Fingerprint.drop_collection()
 
-    build_db()
+    build_db(engine_type)

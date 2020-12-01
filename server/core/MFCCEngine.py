@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 from .Engine import Engine
 from model.Audiotrack import Audiotrack
-from model.MFCCFingerprint import MFCCFingerprint
+from model.Fingerprint import Fingerprint
 
 
 class MFCCEngine(Engine):
@@ -19,15 +19,15 @@ class MFCCEngine(Engine):
         mfcc = self.__extract_mfcc(audiotrack.filename)
         samples = self.__split_mfcc(mfcc)
 
-        return [MFCCFingerprint.create(audiotrack, sample) for sample in samples]
+        return [Fingerprint.create('mfcc', audiotrack, sample) for sample in samples]
 
     def compare(self, lhs, rhs):
         dist, cost, acc_cost, path = dtw(
             lhs.T, rhs.T, dist=lambda x, y: norm(x - y, ord=1))
         return dist
 
-    def find_match(self, audiotrack, top_k=10):
-        fingerprints = MFCCFingerprint.objects(type='mfcc')
+    def find_matches(self, audiotrack, top_k=10):
+        fingerprints = Fingerprint.objects(type='mfcc')
         ref_mfcc = self.extract_fingerprints(audiotrack)
 
         # Calculate top track matches for each reference mfcc and make an average from it
