@@ -7,6 +7,7 @@ from numpy.linalg import norm
 from .Engine import Engine
 from model.Audiotrack import Audiotrack
 from model.Fingerprint import Fingerprint
+from .utils import average_matches
 
 
 class MFCCEngine(Engine):
@@ -35,7 +36,7 @@ class MFCCEngine(Engine):
         for fragment in ref_mfcc:
             sample_matches = self.__calc_fingerprints_distance(
                 fragment.deserialize_data(), fingerprints)
-            song_matches = self.__average_matches(sample_matches, top_k)
+            song_matches = average_matches(sample_matches, 3)
 
             if not total_matches:
                 total_matches = song_matches
@@ -64,29 +65,9 @@ class MFCCEngine(Engine):
                 dist = self.compare(ref_mfcc[:, mfcc.shape[1]], mfcc)
 
             matches.append(
-                {'filename': fingerprint.audiotrack.filename, 'dist': dist})
+                {'filename': fingerprint.audiotrack.filename, 'distance': dist})
 
-        return sorted(matches, key=lambda x: x['dist'])
-
-    def __average_matches(self, matches, top_k):
-        "Calculate sum of top 3 samples for a song"
-        song_matches = {}
-
-        for i in range(len(matches)):
-            match = matches[i]
-            filename = match['filename']
-
-            if not filename in song_matches:
-                song_matches[filename] = {'sum': match['dist'], 'count': 1}
-            elif song_matches[filename]['count'] < 3:
-                song_matches[filename]['count'] += 1
-                # Add distance weighted by logarithm of its position in the list
-                song_matches[filename]['sum'] += match['dist'] * \
-                    (1 + math.log(i + 1, 10))
-
-        # Map into average
-        return {key: (value['sum'] / value['count'])
-                for key, value in song_matches.items()}
+        return sorted(matches, key=lambda x: x['distance'])
 
     def __extract_mfcc(self, file_path):
         "Extracts MFCC descriptors from a audiotrack located in the file_path"

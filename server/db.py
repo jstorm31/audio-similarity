@@ -27,7 +27,7 @@ def build_db(engine_type):
     if engine_type == 'mfcc':
         engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
     elif engine_type == 'chromaprint':
-        engine = ChromaprintEngine(data_path=data_path)
+        engine = ChromaprintEngine(data_path=data_path, sample_size=40)
     else:
         print("Undefined engine type. Available engines: mfcc, chromaprint")
         sys.exit(2)

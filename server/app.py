@@ -9,6 +9,7 @@ from flask_mongoengine import MongoEngine
 from model.Audiotrack import Audiotrack
 from model.Fingerprint import Fingerprint
 from core.MFCCEngine import MFCCEngine
+from core.ChromaprintEngine import ChromaprintEngine
 
 
 load_dotenv()
@@ -29,7 +30,8 @@ db.init_app(app)
 
 data_path = os.getenv('DATA_PATH')
 
-engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
+# engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
+engine = ChromaprintEngine(data_path=data_path, sample_size=40)
 
 
 def json_abort(status_code, message):
@@ -47,7 +49,7 @@ def search():
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
 
     track = Audiotrack.create(filename=audiotrack.filename)
-    matches = engine.find_match(track, top_k=5)
+    matches = engine.find_matches(track, top_k=5)
 
     return Response(json.dumps(matches), mimetype="application/json", status=200)
 
