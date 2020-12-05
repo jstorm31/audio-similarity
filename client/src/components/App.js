@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Typography, Row, Col, Alert, Form, InputNumber } from 'antd';
+import { Layout, Typography, Row, Col, Alert, Form } from 'antd';
 import 'antd/dist/antd.css';
 
 import './App.css';
@@ -8,6 +8,7 @@ import AudioRecord from './AudioRecord';
 import TrackList from './TrackList';
 import upload from '../upload';
 import PlayAudio from './PlayAudio';
+import Settings from './Settings';
 
 const { Title, Text } = Typography;
 
@@ -17,7 +18,7 @@ export const App = () => {
     const [tracks, setTracks] = React.useState([]);
     const [isSearching, setSearching] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const [k, setK] = React.useState(5);
+    const [settings, setSettings] = React.useState({ k: 5, engine: 'chromaprint' });
 
     const handleUpload = async (file) => {
         setSearching(true);
@@ -28,7 +29,7 @@ export const App = () => {
         setAudioName(file.name);
 
         try {
-            const response = await upload(file, k);
+            const response = await upload(file, settings);
             setTracks(response);
             setError(null);
         } catch (error) {
@@ -66,10 +67,7 @@ export const App = () => {
                             </div>
                         )}
 
-                        <Title level={3}>Settings</Title>
-                        <Form.Item label="Top k">
-                            <InputNumber min={1} max={20} value={k} onChange={(value) => setK(value)} />
-                        </Form.Item>
+                        <Settings settings={settings} setSettings={setSettings} />
 
                         {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
                     </Form>
