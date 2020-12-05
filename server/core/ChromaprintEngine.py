@@ -50,7 +50,6 @@ class ChromaprintEngine(Engine):
 
             matches = self.__calc_chromaprints_similarity(sample, chromaprints)
             song_matches = average_matches(matches, 1)
-            print(song_matches)
 
             if not avg_matches:
                 avg_matches = song_matches
@@ -59,7 +58,7 @@ class ChromaprintEngine(Engine):
                     key: max(similarity, avg_matches[key]) for key, similarity in song_matches.items()}
 
         # Sort by similarity
-        return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)]
+        return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)][:top_k]
 
     def __fingerprint_audiotrack(self, path):
         cmd = 'fpcalc %s -raw' % path

@@ -1,6 +1,7 @@
-const upload = async (file) => {
+const upload = async (file, topK = 10) => {
     const data = new FormData();
     data.append('audiotrack', file);
+    data.append('top_k', topK);
 
     const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/search`, {
         method: 'POST',

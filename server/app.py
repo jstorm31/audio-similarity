@@ -45,11 +45,12 @@ def search():
     if not request.files:
         json_abort(400, "'audiotrack' key not set")
 
+    top_k = int(request.form.get('top_k'))
     audiotrack = request.files['audiotrack']
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
 
     track = Audiotrack.create(filename=audiotrack.filename)
-    matches = engine.find_matches(track, top_k=5)
+    matches = engine.find_matches(track, top_k=top_k)
 
     return Response(json.dumps(matches), mimetype="application/json", status=200)
 

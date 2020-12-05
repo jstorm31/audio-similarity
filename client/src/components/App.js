@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Typography, Row, Col, Alert } from 'antd';
+import { Layout, Typography, Row, Col, Alert, Form, InputNumber } from 'antd';
 import 'antd/dist/antd.css';
 
 import './App.css';
@@ -17,6 +17,7 @@ export const App = () => {
     const [tracks, setTracks] = React.useState([]);
     const [isSearching, setSearching] = React.useState(false);
     const [error, setError] = React.useState(null);
+    const [k, setK] = React.useState(5);
 
     const handleUpload = async (file) => {
         setSearching(true);
@@ -27,7 +28,7 @@ export const App = () => {
         setAudioName(file.name);
 
         try {
-            const response = await upload(file);
+            const response = await upload(file, k);
             setTracks(response);
             setError(null);
         } catch (error) {
@@ -44,7 +45,7 @@ export const App = () => {
                 <Text>Record an audio or upload a file to search for similar audiotracks.</Text>
 
                 <section style={{ marginTop: '1rem' }} className="section">
-                    <form>
+                    <Form>
                         <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12}>
                                 <div className="center">
@@ -65,8 +66,13 @@ export const App = () => {
                             </div>
                         )}
 
+                        <Title level={3}>Settings</Title>
+                        <Form.Item label="Top k">
+                            <InputNumber min={1} max={20} value={k} onChange={(value) => setK(value)} />
+                        </Form.Item>
+
                         {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
-                    </form>
+                    </Form>
                 </section>
 
                 {tracks.length > 0 && <TrackList tracks={tracks} />}
