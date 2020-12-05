@@ -73,6 +73,10 @@ class ChromaprintEngine(Engine):
 
     def __parse_chromaprint_output(self, output):
         output = output.decode('utf-8')
+
+        if output == '':
+            raise Exception("Error creating fingerprint")
+
         key = 'FINGERPRINT='
         strip_index = output.find(key) + len(key)
         raw_fingerprint = output[strip_index:-1]
