@@ -33,7 +33,6 @@ class ChromaprintEngine(Engine):
     def compare(self, lhs, rhs):
         "Calculates similarity between two chromaprints"
         error = 0
-        # TODO: It gives similarity larger than 1.0
         for x, y in zip(lhs, rhs):
             error += self.__popcnt(x ^ y)
         return 1.0 - error / 32.0 / min(len(lhs), len(rhs))
@@ -50,14 +49,14 @@ class ChromaprintEngine(Engine):
                 continue
 
             matches = self.__calc_chromaprints_similarity(sample, chromaprints)
-            song_matches = average_matches(matches, 3)
+            song_matches = average_matches(matches, 1)
+            print(song_matches)
 
             if not avg_matches:
                 avg_matches = song_matches
             else:
-                # Calcualte average from current and new matches
                 avg_matches = {
-                    key: (similarity + avg_matches[key]) / 2 for key, similarity in song_matches.items()}
+                    key: max(similarity, avg_matches[key]) for key, similarity in song_matches.items()}
 
         # Sort by similarity
         return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)]
@@ -123,7 +122,7 @@ class ChromaprintEngine(Engine):
             matches.append(
                 {'filename': chromaprint.audiotrack.filename, 'distance': similarity})
 
-        return sorted(matches, key=lambda x: x['distance'])
+        return sorted(matches, key=lambda x: x['distance'], reverse=True)
 
     def __popcnt(self, x):
         """
