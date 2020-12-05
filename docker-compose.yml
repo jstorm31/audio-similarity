@@ -22,7 +22,7 @@ services:
             - '5000:5000'
         env_file: .env
         volumes:
-            - appdata:/app_data
+            - ./data:/app_data
             - ./server:/app
         depends_on:
             - mongodb
@@ -50,6 +50,4 @@ networks:
 
 volumes:
     mongodbdata:
-        driver: local
-    appdata:
         driver: local

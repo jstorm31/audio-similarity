@@ -38,7 +38,12 @@ def build_db(engine_type):
     for file in files:
         track = Audiotrack.create(filename=file)
         track.save()
-        fingerprints = engine.extract_fingerprints(track)
+
+        try:
+            fingerprints = engine.extract_fingerprints(track)
+        except:
+            print("Error fingerprinting ", file)
+            continue
 
         for fingerprint in fingerprints:
             fingerprint_cnt += 1
