@@ -1,6 +1,8 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import { AudioOutlined } from '@ant-design/icons';
+
+const { Text } = Typography;
 
 const State = {
     INIT: 'init',
@@ -79,17 +81,22 @@ const AudioRecord = ({ isSearching, upload }) => {
     }, [isSearching, hasSearched, transition]);
 
     return (
-        <Button
-            type="primary"
-            disabled={isSearching}
-            loading={state === State.SEARCHING}
-            icon={<AudioOutlined />}
-            onClick={() => transition()}
-        >
-            {state === State.INIT && 'Record an audio'}
-            {state === State.RECORDING && 'Recording...'}
-            {state === State.SEARCHING && 'Searching...'}
-        </Button>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Button
+                type="primary"
+                disabled={isSearching}
+                loading={state === State.SEARCHING}
+                icon={<AudioOutlined />}
+                onClick={() => transition()}
+            >
+                {state === State.INIT && 'Record an audio'}
+                {state === State.RECORDING && 'Recording...'}
+                {state === State.SEARCHING && 'Searching...'}
+            </Button>
+            {state === State.RECORDING && (
+                <Text style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>Record at least 4 seconds</Text>
+            )}
+        </div>
     );
 };
 

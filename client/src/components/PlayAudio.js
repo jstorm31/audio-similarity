@@ -47,7 +47,7 @@ const PlayAudio = ({ audio: audioProp, filename }) => {
         if (playing && audio) {
             timeout = setTimeout(() => {
                 resetAudio();
-            }, audio.duration * 1000);
+            }, 10000);
         }
 
         return () => clearTimeout(timeout);
