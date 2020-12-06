@@ -10,6 +10,7 @@ This project is a semestral work for course NI-VMM on FIT CTU. It is a Shazam-li
    - [db.py](server/db.py) - database construction script.
    - [get_engine.py](server/db.py) - function to initialize correct engine type. It has `-e` parameter to set an engine type (`mfcc`, `chromaprint` or `chromaprint_cc`) and `-c` parameter which will erase the database before constructing it.
  - [client](client) - client web React app
+ - [Jupyter notebook](audio_similarity_prototype.ipynb) with prototypes
 
 ## Running locally
 
