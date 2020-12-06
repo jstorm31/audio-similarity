@@ -25,7 +25,7 @@ def build_db(engine_type):
     data_path = os.getenv('DATA_PATH')
 
     if engine_type == 'mfcc':
-        engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
+        engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=5)
     elif engine_type == 'chromaprint':
         engine = ChromaprintEngine(data_path=data_path, sample_size=40)
     else:
@@ -36,8 +36,11 @@ def build_db(engine_type):
     fingerprint_cnt = 0
 
     for file in files:
-        track = Audiotrack.create(filename=file)
-        track.save()
+        tracks = Audiotrack.objects(filename=file)
+        track = tracks[0] if len(tracks) > 0 else None
+        if track is None:
+            track = Audiotrack.create(filename=file)
+            track.save()
 
         try:
             fingerprints = engine.extract_fingerprints(track)
@@ -66,18 +69,24 @@ if __name__ == '__main__':
     db_connect()
 
     try:
-        arguments, values = getopt.getopt(sys.argv[1:], 'e', 'engine')
+        arguments, values = getopt.getopt(
+            sys.argv[1:], 'e:c', ['engine', 'clear'])
     except getopt.error as err:
         print(str(err))
         sys.exit(2)
 
     engine_type = 'chromaprint'
+    clear = False
     for i in range(len(arguments)):
         if arguments[i][0] in ('-e', '--engine'):
-            engine_type = values[i]
+            engine_type = arguments[i][1]
+        elif arguments[i][0] in ('-c', '--clear'):
+            clear = True
 
     # Clear collections
-    Audiotrack.drop_collection()
-    Fingerprint.drop_collection()
+    if clear:
+        print("Clearing all audiotracks...")
+        Audiotrack.drop_collection()
+    Fingerprint.objects(type=engine_type).delete()
 
     build_db(engine_type)

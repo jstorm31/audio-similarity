@@ -30,8 +30,10 @@ db.init_app(app)
 
 data_path = os.getenv('DATA_PATH')
 
-# engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=10)
-engine = ChromaprintEngine(data_path=data_path, sample_size=40)
+engines = {
+    'mfcc': MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=5),
+    'chromaprint': ChromaprintEngine(data_path=data_path, sample_size=40)
+}
 
 
 def json_abort(status_code, message):
@@ -46,6 +48,12 @@ def search():
         json_abort(400, "'audiotrack' key not set")
 
     top_k = int(request.form.get('top_k'))
+    engine_type = request.form.get('engine')
+
+    if not top_k or not engine_type:
+        json_abort(400, 'engine and top_k params missing')
+
+    engine = engines[engine_type]
     audiotrack = request.files['audiotrack']
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
 

@@ -36,14 +36,14 @@ class MFCCEngine(Engine):
         for fragment in ref_mfcc:
             sample_matches = self.__calc_fingerprints_distance(
                 fragment.deserialize_data(), fingerprints)
-            song_matches = average_matches(sample_matches, 3)
+            song_matches = average_matches(sample_matches, 1)
 
             if not total_matches:
                 total_matches = song_matches
             else:
                 # Calcualte average from current and new matches
                 total_matches = {
-                    key: (dist + total_matches[key]) / 2 for key, dist in song_matches.items()}
+                    key: max(dist, total_matches[key]) for key, dist in song_matches.items()}
 
         # Sort by distance
         return [{'filename': k, 'similarity': v} for k, v in sorted(total_matches.items(), key=lambda x: x[1])]
