@@ -14,7 +14,7 @@ const columns = [
         title: 'Similarity',
         dataIndex: 'similarity',
         key: 'similarity',
-        render: (similarity) => Number(similarity).toFixed(2),
+        render: (similarity) => Number(similarity).toFixed(3),
     },
     {
         key: 'action',

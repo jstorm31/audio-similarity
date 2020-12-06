@@ -4,9 +4,12 @@ import numpy
 from .ChromaprintEngine import ChromaprintEngine
 from model.Fingerprint import Fingerprint, FingerprintType
 
+class OverlapException(Exception):
+    pass
+
 
 class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
-    def __init__(self, data_path, span=150, step=1, min_overlap=20, treshold=0.5):
+    def __init__(self, data_path, span=40, step=1, min_overlap=8, treshold=0.5):
         super(ChromaprintCrossCorrelationEngine,
               self).__init__(data_path, None)
         self.span = span  # number of points to scan cross correlation over
@@ -30,28 +33,21 @@ class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
         return self.__get_max_corr(cross_correlations, lhs, rhs)
 
     def find_matches(self, audiotrack, top_k):
-        chromaprints = Fingerprint.objects(
-            type=FingerprintType.CHROMAPRINT_CC.value)
-        ref_chromaprints = self.extract_fingerprints(audiotrack)
-        ref_samples = [sample.deserialize_data()
-                       for sample in ref_chromaprints]
+        chromaprints = Fingerprint.objects(type=FingerprintType.CHROMAPRINT_CC.value)
+        ref_chromaprint = self.extract_fingerprints(audiotrack)[0]
 
-        avg_matches = []
-        for sample in ref_samples:
-            if len(sample) == 0:
+        if len(ref_chromaprint) == 0:
+            raise Exception("Empty reference audiotrack")
+
+        matches = []
+        for chromaprint in chromaprints:
+            if len(chromaprint) == 0:
                 continue
 
-            matches = self.__calc_chromaprints_similarity(sample, chromaprints)
-            song_matches = average_matches(matches, 1)
+            sim = self.compare(ref_chromaprint.deserialize_data(), chromaprint.deserialize_data())
+            matches.append({ 'filename': chromaprint.audiotrack.filename, 'similarity': sim })
 
-            if not avg_matches:
-                avg_matches = song_matches
-            else:
-                avg_matches = {
-                    key: max(similarity, avg_matches[key]) for key, similarity in song_matches.items()}
-
-        # Sort by similarity
-        return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)][:top_k]
+        return sorted(matches, key=lambda x: x['similarity'], reverse=True)[:top_k]
 
     def __correlation(self, listx, listy):
         """
@@ -64,7 +60,7 @@ class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
         for x, y in zip(listx, listy):
             covariance += 32 - bin(x ^ y).count("1")
 
-        covariance = covariance / float(min(len(listx), len(list(y))))
+        covariance = covariance / float(min(len(listx), len(listy)))
         return covariance / 32
 
     def __cross_correlation(self, listx, listy, offset):
@@ -80,8 +76,7 @@ class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
             listx = listx[:len(listy)]
 
         if min(len(listx), len(listy)) < self.min_overlap:
-            raise Exception(
-                'Cross correlation error - overlap too small: %i' % min(len(listx), len(listy)))
+            raise OverlapException()
         return self.__correlation(listx, listy)
 
     def __compare(self, listx, listy):
@@ -89,13 +84,14 @@ class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
         Cross correlate listx and listy with offsets from -span to span
         """
         min_len = min(len(listx), len(listy))
-        if self.span > min_len:
-            raise Exception('span >= sample size: %i >= %i\n' % (
-                self.span, min_len + 'Reduce span, reduce crop or increase sample_time.'))
+        span = self.span if self.span <= min_len else min_len
 
         corr_xy = []
-        for offset in numpy.arange(-self.span, self.span + 1, self.step):
-            corr_xy.append(self.__cross_correlation(listx, listy, offset))
+        for offset in numpy.arange(-span, span + 1, self.step):
+            try:
+                corr_xy.append(self.__cross_correlation(listx, listy, offset))
+            except OverlapException:
+                continue
         return corr_xy
 
     def __max_index(self, listx):
