@@ -16,6 +16,7 @@ export const App = () => {
     const [audio, setAudio] = React.useState(null);
     const [audioName, setAudioName] = React.useState('');
     const [tracks, setTracks] = React.useState([]);
+    const [searchTime, setSearchTime] = React.useState(0);
     const [isSearching, setSearching] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [settings, setSettings] = React.useState({ k: 5, engine: 'chromaprint' });
@@ -29,8 +30,9 @@ export const App = () => {
         setAudioName(file.name);
 
         try {
-            const response = await upload(file, settings);
-            setTracks(response);
+            const { data, time } = await upload(file, settings);
+            setTracks(data);
+            setSearchTime(time);
             setError(null);
         } catch (error) {
             setError(error.message);
@@ -45,7 +47,7 @@ export const App = () => {
                 <Title style={{ marginBottom: '0.5rem' }}>Search audio</Title>
                 <Text>Record an audio or upload a file to search for similar audiotracks.</Text>
 
-                <section style={{ marginTop: '1rem' }} className="section">
+                <section className="section">
                     <form>
                         <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12}>
@@ -73,7 +75,7 @@ export const App = () => {
                     {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
                 </section>
 
-                {tracks.length > 0 && <TrackList tracks={tracks} />}
+                {tracks.length > 0 && <TrackList tracks={tracks} searchTime={searchTime} />}
             </Layout.Content>
         </Layout>
     );

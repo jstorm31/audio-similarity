@@ -9,15 +9,13 @@ class OverlapException(Exception):
 
 
 class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
-    def __init__(self, data_path, span=40, step=1, min_overlap=8, treshold=0.5):
+    def __init__(self, data_path, span=40, step=1, min_overlap=8):
         super(ChromaprintCrossCorrelationEngine,
               self).__init__(data_path, None)
         self.span = span  # number of points to scan cross correlation over
         self.step = step  # step size (in points) of cross correlation
         # minimum number of points that must overlap in cross correlation
         self.min_overlap = min_overlap
-        # report match when cross correlation has a peak exceeding threshold
-        self.treshold = treshold
 
     def extract_fingerprints(self, audiotrack):
         path = self.data_path + audiotrack.filename

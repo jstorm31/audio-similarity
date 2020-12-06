@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Table } from 'antd';
 import PlayAudio from './PlayAudio';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const columns = [
     {
@@ -22,9 +22,10 @@ const columns = [
     },
 ];
 
-const TrackList = ({ tracks }) => (
+const TrackList = ({ tracks, searchTime }) => (
     <>
         <Title level={2}>Best matches</Title>
+        <Text>Search time: {Number(searchTime).toFixed(2)} s</Text>
 
         <section className="section section--table">
             <Table columns={columns} dataSource={tracks} rowKey="filename" pagination={false} />

@@ -1,6 +1,7 @@
 import datetime
 import os
 import json
+import time
 from dotenv import load_dotenv
 
 from flask import Flask, Response, request, abort, jsonify, send_from_directory
@@ -49,6 +50,7 @@ def search():
     if not top_k or not engine_type:
         json_abort(400, 'engine and top_k params missing')
 
+    start = time.time()
     engine = get_engine(engine_type)
     audiotrack = request.files['audiotrack']
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
@@ -56,7 +58,12 @@ def search():
     track = Audiotrack.create(filename=audiotrack.filename)
     matches = engine.find_matches(track, top_k=top_k)
 
-    return Response(json.dumps(matches), mimetype="application/json", status=200)
+    response = {
+        'data': matches,
+        'time': time.time() - start,
+    }
+
+    return Response(json.dumps(response), mimetype="application/json", status=200)
 
 
 @app.route('/audiotracks/<path:filename>')
