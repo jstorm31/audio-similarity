@@ -8,9 +8,11 @@ from dotenv import load_dotenv
 from mongoengine import connect
 
 from model.Audiotrack import Audiotrack
-from model.Fingerprint import Fingerprint
+from model.Fingerprint import Fingerprint, FingerprintType
 from core.MFCCEngine import MFCCEngine
 from core.ChromaprintEngine import ChromaprintEngine
+from core.ChromaprintCrossCorrelationEngine import ChromaprintCrossCorrelationEngine
+from core.get_engine import get_engine
 
 
 def is_audiofile(data_path, file):
@@ -20,18 +22,11 @@ def is_audiofile(data_path, file):
 
 
 def build_db(engine_type):
-    print("Building db with %s engine" % engine_type)
+    print("Building db with %s engine" % engine_type.value)
     start = time.time()
     data_path = os.getenv('DATA_PATH')
 
-    if engine_type == 'mfcc':
-        engine = MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=5)
-    elif engine_type == 'chromaprint':
-        engine = ChromaprintEngine(data_path=data_path, sample_size=40)
-    else:
-        print("Undefined engine type. Available engines: mfcc, chromaprint")
-        sys.exit(2)
-
+    engine = get_engine(engine_type)
     files = [f for f in listdir(data_path) if is_audiofile(data_path, f)]
     fingerprint_cnt = 0
 
@@ -44,8 +39,8 @@ def build_db(engine_type):
 
         try:
             fingerprints = engine.extract_fingerprints(track)
-        except:
-            print("Error fingerprinting ", file)
+        except Exception as e:
+            print("Error fingerprinting ", file, e)
             continue
 
         for fingerprint in fingerprints:
@@ -75,11 +70,11 @@ if __name__ == '__main__':
         print(str(err))
         sys.exit(2)
 
-    engine_type = 'chromaprint'
+    engine_type = FingerprintType.CHROMAPRINT
     clear = False
     for i in range(len(arguments)):
         if arguments[i][0] in ('-e', '--engine'):
-            engine_type = arguments[i][1]
+            engine_type = FingerprintType.create(arguments[i][1])
         elif arguments[i][0] in ('-c', '--clear'):
             clear = True
 
@@ -87,6 +82,8 @@ if __name__ == '__main__':
     if clear:
         print("Clearing all audiotracks...")
         Audiotrack.drop_collection()
-    Fingerprint.objects(type=engine_type).delete()
+        Fingerprint.drop_collection()
+    else:
+        Fingerprint.objects(type=engine_type.value).delete()
 
     build_db(engine_type)

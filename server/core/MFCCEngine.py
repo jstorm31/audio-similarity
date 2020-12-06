@@ -20,7 +20,7 @@ class MFCCEngine(Engine):
         mfcc = self.__extract_mfcc(audiotrack.filename)
         samples = self.__split_mfcc(mfcc)
 
-        return [Fingerprint.create('mfcc', audiotrack, sample) for sample in samples]
+        return [Fingerprint.create(FingerprintType.MFCC.value, audiotrack, sample) for sample in samples]
 
     def compare(self, lhs, rhs):
         dist, cost, acc_cost, path = dtw(
@@ -28,7 +28,7 @@ class MFCCEngine(Engine):
         return dist
 
     def find_matches(self, audiotrack, top_k=10):
-        fingerprints = Fingerprint.objects(type='mfcc')
+        fingerprints = Fingerprint.objects(type=FingerprintType.MFCC.value)
         ref_mfcc = self.extract_fingerprints(audiotrack)
 
         # Calculate top track matches for each reference mfcc and make an average from it
@@ -70,8 +70,9 @@ class MFCCEngine(Engine):
         return sorted(matches, key=lambda x: x['distance'])
 
     def __extract_mfcc(self, file_path):
-        "Extracts MFCC descriptors from a audiotrack located in the file_path"
-        signal, sr = librosa.load(self.data_path + file_path)
+        "Extracts MFCC descriptors from an audiotrack located in the file_path"
+        signal, sr = librosa.load(
+            path=self.data_path + file_path, duration=120.0)
         mfcc = librosa.feature.mfcc(signal, n_mfcc=self.n_mfcc, sr=sr)
         return mfcc
 

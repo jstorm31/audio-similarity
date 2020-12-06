@@ -20,4 +20,7 @@ server:
 	DOCKER_BUILDKIT=1 docker-compose up -d --remove-orphans --build server
 
 db:
-	docker-compose exec server python ./db.py -e chromaprint -c && docker-compose exec server python ./db.py -e mfcc
+	docker-compose exec server python ./db.py -e chromaprint -c && docker-compose exec server python ./db.py -e chromaprint_cc
+
+db_mfcc:
+	docker-compose exec server python ./db.py -e mfcc

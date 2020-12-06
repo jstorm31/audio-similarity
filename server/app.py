@@ -7,9 +7,10 @@ from flask import Flask, Response, request, abort, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_mongoengine import MongoEngine
 from model.Audiotrack import Audiotrack
-from model.Fingerprint import Fingerprint
+from model.Fingerprint import Fingerprint, FingerprintType
 from core.MFCCEngine import MFCCEngine
 from core.ChromaprintEngine import ChromaprintEngine
+from core.get_engine import get_engine
 
 
 load_dotenv()
@@ -30,11 +31,6 @@ db.init_app(app)
 
 data_path = os.getenv('DATA_PATH')
 
-engines = {
-    'mfcc': MFCCEngine(data_path=data_path, sample_size=200, n_mfcc=5),
-    'chromaprint': ChromaprintEngine(data_path=data_path, sample_size=40)
-}
-
 
 def json_abort(status_code, message):
     response = jsonify({'error': message})
@@ -48,12 +44,12 @@ def search():
         json_abort(400, "'audiotrack' key not set")
 
     top_k = int(request.form.get('top_k'))
-    engine_type = request.form.get('engine')
+    engine_type = FingerprintType.create(request.form.get('engine'))
 
     if not top_k or not engine_type:
         json_abort(400, 'engine and top_k params missing')
 
-    engine = engines[engine_type]
+    engine = get_engine(engine_type)
     audiotrack = request.files['audiotrack']
     audiotrack.save(os.path.join(data_path, audiotrack.filename))
 

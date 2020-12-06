@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Typography, Row, Col, Alert, Form } from 'antd';
+import { Layout, Typography, Row, Col, Alert } from 'antd';
 import 'antd/dist/antd.css';
 
 import './App.css';
@@ -46,7 +46,7 @@ export const App = () => {
                 <Text>Record an audio or upload a file to search for similar audiotracks.</Text>
 
                 <section style={{ marginTop: '1rem' }} className="section">
-                    <Form>
+                    <form>
                         <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12}>
                                 <div className="center">
@@ -59,18 +59,18 @@ export const App = () => {
                                 </div>
                             </Col>
                         </Row>
+                    </form>
 
-                        {audio && audioName && (
-                            <div className="sample">
-                                <Text style={{ marginRight: '1rem' }}>{audioName}</Text>
-                                <PlayAudio audio={audio} />
-                            </div>
-                        )}
+                    {audio && audioName && (
+                        <div className="sample">
+                            <Text style={{ marginRight: '1rem' }}>{audioName}</Text>
+                            <PlayAudio audio={audio} />
+                        </div>
+                    )}
 
-                        <Settings settings={settings} setSettings={setSettings} />
+                    <Settings settings={settings} setSettings={setSettings} />
 
-                        {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
-                    </Form>
+                    {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
                 </section>
 
                 {tracks.length > 0 && <TrackList tracks={tracks} />}

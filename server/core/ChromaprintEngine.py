@@ -2,7 +2,7 @@ import subprocess
 import math
 
 from .Engine import Engine
-from model.Fingerprint import Fingerprint
+from model.Fingerprint import Fingerprint, FingerprintType
 from .utils import average_matches
 
 
@@ -25,10 +25,10 @@ class ChromaprintEngine(Engine):
 
     def extract_fingerprints(self, audiotrack):
         path = self.data_path + audiotrack.filename
-        chromaprint = self.__fingerprint_audiotrack(path)
+        chromaprint = self._fingerprint_audiotrack(path)
         samples = self.__split_chromaprint(chromaprint)
 
-        return [Fingerprint.create('chromaprint', audiotrack, sample) for sample in samples]
+        return [Fingerprint.create(FingerprintType.CHROMAPRINT.value, audiotrack, sample) for sample in samples]
 
     def compare(self, lhs, rhs):
         "Calculates similarity between two chromaprints"
@@ -38,7 +38,8 @@ class ChromaprintEngine(Engine):
         return 1.0 - error / 32.0 / min(len(lhs), len(rhs))
 
     def find_matches(self, audiotrack, top_k):
-        chromaprints = Fingerprint.objects(type='chromaprint')
+        chromaprints = Fingerprint.objects(
+            type=FingerprintType.CHROMAPRINT.value)
         ref_chromaprints = self.extract_fingerprints(audiotrack)
         ref_samples = [sample.deserialize_data()
                        for sample in ref_chromaprints]
@@ -60,7 +61,7 @@ class ChromaprintEngine(Engine):
         # Sort by similarity
         return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)][:top_k]
 
-    def __fingerprint_audiotrack(self, path):
+    def _fingerprint_audiotrack(self, path):
         cmd = 'fpcalc %s -raw' % path
         process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
