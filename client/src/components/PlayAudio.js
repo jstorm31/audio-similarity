@@ -34,6 +34,7 @@ const PlayAudio = ({ audio: audioProp, filename }) => {
         }
 
         if (!playing) {
+            audio.currentTime = audio.duration * 0.3;
             setPlaying(true);
             audio.play();
         } else {
