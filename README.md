@@ -16,9 +16,9 @@ This project is a semestral work for course NI-VMM on FIT CTU. It is a Shazam-li
 
 The project consists of a python Flask server, MongoDB database and React web client. Everything runs in Docker containers, so **Docker needs to be installed** on the target system.
 
-1. Add `.env` file with all required environment variables into the root of project. Sample can be found in `.env.example`
-2. Run `make run` which will build and start all docker containers
-3. Make sure you have `data` folder with audiofiles (mp3, wav,..) created locally.
+1. Add `.env` file with all required environment variables into the root of project. A sample can be found in `.env.example`
+2. Make sure you have `data` folder with audiofiles (mp3, wav,..) created locally.
+3. Run `make run` which will build and start all docker containers
 4. Run `make db` to construct the reference database. It will take all audio files from the `data` folder.
 5. (optional) If you want to also use `MFCCEngine`, run `make db_mfcc`. Note it will last much longer than `make db`.
 
