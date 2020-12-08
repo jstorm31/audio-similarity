@@ -11,7 +11,7 @@ class OverlapException(Exception):
 class ChromaprintCrossCorrelationEngine(ChromaprintEngine):
     def __init__(self, data_path, span=40, step=1, min_overlap=8):
         super(ChromaprintCrossCorrelationEngine,
-              self).__init__(data_path, None)
+              self).__init__(data_path, None, 1)
         self.span = span  # number of points to scan cross correlation over
         self.step = step  # step size (in points) of cross correlation
         # minimum number of points that must overlap in cross correlation

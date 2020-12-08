@@ -14,8 +14,22 @@ class Engine(ABC):
 
     @abstractmethod
     def compare(self, lhs, rhs):
+        """Compares two fingerprints
+
+        Parameters
+        ----------
+        lhs : Fingerprint
+        rhs : Fingerprint
+        """
         pass
 
     @abstractmethod
     def find_matches(self, audiotrack, top_k):
+        """Finds the top_k most similar audiotracks for the reference audiotrack
+
+        Parameters
+        ----------
+        audiotrack : Audiotrack
+        top_K : integer
+        """
         pass

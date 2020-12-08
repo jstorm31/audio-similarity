@@ -44,8 +44,9 @@ def search():
     if not request.files:
         json_abort(400, "'audiotrack' key not set")
 
-    top_k = int(request.form.get('top_k'))
-    engine_type = FingerprintType.create(request.form.get('engine'))
+    form = request.form.to_dict()
+    top_k = int(form['top_k'])
+    engine_type = FingerprintType.create(form['engine'])
 
     if not top_k or not engine_type:
         json_abort(400, 'engine and top_k params missing')

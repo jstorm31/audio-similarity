@@ -75,7 +75,7 @@ export const App = () => {
                     {error && <Alert type="error" message={error} style={{ marginTop: '2rem' }} />}
                 </section>
 
-                {tracks.length > 0 && <TrackList tracks={tracks} searchTime={searchTime} />}
+                {tracks.length > 0 && <TrackList tracks={tracks} searchTime={searchTime} engine={settings.engine} />}
             </Layout.Content>
         </Layout>
     );

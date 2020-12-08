@@ -19,9 +19,10 @@ popcnt_table_8bit = [
 
 
 class ChromaprintEngine(Engine):
-    def __init__(self, data_path, sample_size):
+    def __init__(self, data_path, sample_size, n_average):
         self.data_path = data_path
         self.sample_size = sample_size
+        self.n_average = n_average
 
     def extract_fingerprints(self, audiotrack):
         path = self.data_path + audiotrack.filename
@@ -50,7 +51,7 @@ class ChromaprintEngine(Engine):
                 continue
 
             matches = self.__calc_chromaprints_similarity(sample, chromaprints)
-            song_matches = average_matches(matches, 1)
+            song_matches = average_matches(matches, self.n_average)
 
             if not avg_matches:
                 avg_matches = song_matches
@@ -59,7 +60,7 @@ class ChromaprintEngine(Engine):
                     key: max(similarity, avg_matches[key]) for key, similarity in song_matches.items()}
 
         # Sort by similarity
-        return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)][:top_k]
+        return [{'filename': k, 'similarity': v} for k, v in sorted(avg_matches.items(), key=lambda x: x[1], reverse=True)[:top_k]]
 
     def _fingerprint_audiotrack(self, path):
         cmd = 'fpcalc %s -raw' % path
